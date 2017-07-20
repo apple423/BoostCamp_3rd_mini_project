@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#999999"
+    >
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/prev_cardView"
+        android:layout_width="190dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/prev_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+
+            android:text="@string/prev"
+            android:textColor="@android:color/black" />
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/next_cardView"
+        android:layout_width="190dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/next_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:text="@string/next"
+            android:textColor="@android:color/black" />
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

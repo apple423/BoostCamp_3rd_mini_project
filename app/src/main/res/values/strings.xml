@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BoostCamp3</string>
+    <string name="google_maps_key">AIzaSyBWHbHLt3xc_me3EGwnAuNwJkdeJFVCt-U</string>
+    <string name="next">다음</string>
+    <string name="prev">이전</string>
+    <string name="shop_title">title</string>
+    <string name="shop_address">address</string>
+    <string name="shop_phone">phone</string>
+    <string name="text_length">글자수 : </string>
+    <string name="content">content</string>
+</resources>
