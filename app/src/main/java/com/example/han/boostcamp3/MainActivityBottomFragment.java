@@ -17,12 +17,14 @@ public class MainActivityBottomFragment extends Fragment {
 
     private NextButtonClickListener nextButtonClickListener;
     private CardView nextCardView;
+    private CardView prevCardView;
     private boolean oneTime = false;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         nextButtonClickListener = (NextButtonClickListener)context;
+        // onAttach시 메인 엑티비티의 리스너를 이 프레그먼트의 리스너에 할당
 
     }
 
@@ -32,8 +34,12 @@ public class MainActivityBottomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.activity_main_bottom_fragment,container,false);
+        // 다음, 이전 버튼에 리스너 등록
         nextCardView = (CardView) view.findViewById(R.id.next_cardView);
         nextCardView.setOnClickListener(onClickListener);
+        prevCardView = (CardView) view.findViewById(R.id.prev_cardView);
+        prevCardView.setOnClickListener(onClickListener);
+
 
         return view;
 

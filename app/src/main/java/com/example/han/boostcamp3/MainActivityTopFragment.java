@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.han.boostcamp3.data.ShopContract;
 import com.google.android.gms.location.places.Place;
@@ -27,6 +30,8 @@ public class MainActivityTopFragment extends Fragment {
 
     private EditText shopTitleEditText,shopAddressEditText,
             shopPhoneEditText,shopContentEditText;
+
+    private TextView countLengthTextView;
 
     private Place place;
     @Override
@@ -50,6 +55,9 @@ public class MainActivityTopFragment extends Fragment {
         shopPhoneEditText = (EditText)view.findViewById(R.id.shop_phone_EditText);
 
         shopContentEditText = (EditText)view.findViewById(R.id.shop_content_EditText);
+        countLengthTextView = (TextView)view.findViewById(R.id.textView_count);
+        shopContentEditText.addTextChangedListener(textWatcher);
+
 
         return view;
     }
@@ -62,6 +70,26 @@ public class MainActivityTopFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            int length = s.length();
+           countLengthTextView.setText(length + "/300");
+
+
+        }
+    };
 
 
     public interface OnClickViewInTopFragmentListener{
@@ -78,6 +106,7 @@ public class MainActivityTopFragment extends Fragment {
         }
     };
 
+    // PalceAutoComplete에서 place정보를 가져옵니다.
     public Place setPlaceFromMainActivity(Place place){
 
         this.place = place;
@@ -91,6 +120,7 @@ public class MainActivityTopFragment extends Fragment {
 
     }
 
+    // EditText에서 사용자가 입력한 정보를 저장하여 반환
     public ContentValues getShopValues(){
 
         String title = shopTitleEditText.getText().toString();
@@ -110,5 +140,14 @@ public class MainActivityTopFragment extends Fragment {
         cv.put(ShopContract.ShopEntry.SHOP_CONTENT, content);
 
         return cv;
+    }
+
+    //EditText를 비워주기 위함
+    public void refreshEditText(){
+
+        shopTitleEditText.setText("");
+        shopAddressEditText.setText("");
+        shopPhoneEditText.setText("");
+        shopContentEditText.setText("");
     }
 }
