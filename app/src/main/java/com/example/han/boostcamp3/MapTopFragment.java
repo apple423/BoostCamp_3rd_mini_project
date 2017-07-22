@@ -42,7 +42,7 @@ import java.util.Locale;
  */
 
 public class MapTopFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener,
-        GoogleMap.OnMyLocationButtonClickListener{
+        GoogleMap.OnMyLocationButtonClickListener {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int MAX_RESULT_OF_ADDRESS = 1;
@@ -78,7 +78,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         ShopDBHelper shopDBHelper = new ShopDBHelper(getContext());
         sqLiteDatabase = shopDBHelper.getReadableDatabase();
-        cursor = getAllShops();
+        //cursor = getAllShops();
 
         if (mapFragment != null) {
 
@@ -102,7 +102,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Cursor cursor = getAllShops();
+        cursor = getAllShops();
         String address;
         double lat;
         double lng;
@@ -137,7 +137,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
 
     }
 
-    public Cursor getAllShops(){
+    public Cursor getAllShops() {
         return sqLiteDatabase.query(
                 ShopContract.ShopEntry.TABLE_NAME,
                 null,
@@ -164,37 +164,36 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
     @Override
     public void onMarkerDragEnd(Marker marker) {
 
-       latLng = marker.getPosition();
+        latLng = marker.getPosition();
 
-        String addressString = getCurrentAddress(latLng.latitude,latLng.longitude);
+        String addressString = getCurrentAddress(latLng.latitude, latLng.longitude);
 
         mapAddressTextView.setText(addressString);
 
     }
 
-    public String getCurrentAddress(double lat, double lng){
+    public String getCurrentAddress(double lat, double lng) {
 
         try {
-            List= geocoder.getFromLocation(lat,lng,MAX_RESULT_OF_ADDRESS);
+            List = geocoder.getFromLocation(lat, lng, MAX_RESULT_OF_ADDRESS);
             address = List.get(0);
             List.clear();
 
             return address.getAddressLine(0);
         } catch (IOException e) {
             e.printStackTrace();
-            return"";
+            return "";
         }
 
     }
 
-    public void checkMyLocation(){
+    public void checkMyLocation() {
 
         if (ActivityCompat.checkSelfPermission(getContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-             mLocationPermissionGranted = true;
-        }
-        else {
+            mLocationPermissionGranted = true;
+        } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -202,13 +201,12 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
 
-        if(mLocationPermissionGranted){
+        if (mLocationPermissionGranted) {
 
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.setOnMyLocationButtonClickListener(this);
-        }
-        else{
+        } else {
 
             mMap.setMyLocationEnabled(false);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -224,21 +222,20 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
                 android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             mLocationPermissionGranted = true;
-        }
-        else {
+        } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
-        if(mLocationPermissionGranted){
+        if (mLocationPermissionGranted) {
 
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
         }
 
-        String string = getCurrentAddress(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+        String string = getCurrentAddress(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
         mapAddressTextView.setText(string);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -246,10 +243,37 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
                         mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
 
         mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLatitude()))
+                .position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLatitude()))
                 .title("current Location")
                 .draggable(true));
 
         return true;
+    }
+
+
+    public void searchNextLocation() {
+
+        double lat;
+        double lng;
+
+        if (cursor.isAfterLast()||cursor.isLast()) {
+
+            cursor.moveToFirst();
+            Log.d("MoveToFirst","yyy");
+
+        } else {
+
+            cursor.moveToNext();
+            Log.d("MoveToNext","nextnextnext");
+        }
+
+        lat = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LAT));
+        lng = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LNG));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(lat, lng), 15));
+
+        String addressString = getCurrentAddress(lat,lng);
+        mapAddressTextView.setText(addressString);
+
     }
 }

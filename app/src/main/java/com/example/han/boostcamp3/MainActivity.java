@@ -35,7 +35,11 @@ import static com.example.han.boostcamp3.R.id.map;
 
 public class MainActivity extends AppCompatActivity implements
         MainActivityBottomFragment.NextButtonClickListener,
-        MainActivityTopFragment.OnClickViewInTopFragmentListener{
+        MainActivityTopFragment.OnClickViewInTopFragmentListener,
+        MapBottomFragment.NextButtonClickListener{
+
+
+
     private final static int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
@@ -71,23 +75,9 @@ public class MainActivity extends AppCompatActivity implements
 
         fragmentTransaction.add(R.id.main_top_fragment, mapTopFragment);
         fragmentTransaction.add(R.id.main_bottom_fragment, mapBottomFragment);
-        /*fragmentTransaction.add(R.id.main_top_fragment, mainActivityTopFragment);
+/*        fragmentTransaction.add(R.id.main_top_fragment, mainActivityTopFragment);
         fragmentTransaction.add(R.id.main_bottom_fragment, mainActivityBottomFragment);*/
         fragmentTransaction.commit();
-
-
-
-
-        //mapFragment.getMapAsync(this);*/
-        /*mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, null)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();*/
-
-
-
 
         ShopDBHelper shopDBHelper = new ShopDBHelper(this);
         sqLiteDatabase = shopDBHelper.getWritableDatabase();
@@ -109,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements
                 fragmentTransactionNext.replace(R.id.main_top_fragment,mapTopFragment);
                 fragmentTransactionNext.replace(R.id.main_bottom_fragment, mapBottomFragment);
                 fragmentTransactionNext.commit();
-                mGoogleApiClient.connect();
+                //mGoogleApiClient.connect();
 
                /* supportMapFragment = mapTopFragment.getMapFragment();
                 supportMapFragment.getMapAsync(this);*/
@@ -153,10 +143,9 @@ public class MainActivity extends AppCompatActivity implements
                 placeForAddress = PlaceAutocomplete.getPlace(this, data);
                 mainActivityTopFragment.setAddressInCardView(placeForAddress.getAddress().toString());
                 mainActivityTopFragment.setPlaceFromMainActivity(placeForAddress);
-                //Log.i("ㄴㅇㅎㅎㄴㅇㄶㅇㅁ", "Place: " + place.getName());
+
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
-                // TODO: Handle the error.
                 Log.i("ㄸㄲㄲㄲㄲㄲㄲ꺢", status.getStatusMessage());
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -169,52 +158,17 @@ public class MainActivity extends AppCompatActivity implements
 
         ContentValues cv = mainActivityTopFragment.getShopValues();
 
-        /*ContentValues cv = new ContentValues();
-        cv.put(ShopContract.ShopEntry.SHOP_TITLE,title);
-        cv.put(ShopContract.ShopEntry.SHOP_ADDRESS,address);
-        cv.put(ShopContract.ShopEntry.SHOP_LAT,lat);
-        cv.put(ShopContract.ShopEntry.SHOP_LNG,lng);
-        cv.put(ShopContract.ShopEntry.SHOP_PHONE, phone);
-        cv.put(ShopContract.ShopEntry.SHOP_CONTENT, content);*/
-
         sqLiteDatabase.insert(ShopContract.ShopEntry.TABLE_NAME,null,cv);
     }
 
- /*   public Cursor getAllShops(){
-        return sqLiteDatabase.query(
-                ShopContract.ShopEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-                );
+
+    @Override
+    public void onClickMapNextButton(int id) {
+
+        if(id == R.id.map_next_cardView){
+
+            mapTopFragment.searchNextLocation();
+        }
 
     }
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        Cursor cursor = getAllShops();
-
-        if(cursor.moveToFirst()){
-
-            do{
-
-                String title = cursor.getString(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_TITLE));
-                double lat = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LAT));
-                double lng = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LNG));
-                Log.i("datas : ",title + " &" + lat + " & " + lng);
-
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(lat, lng))
-                        .title(title));
-
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(lat, lng), 15));
-
-            }while(cursor.moveToNext());
-        }
-    }*/
-
 }
