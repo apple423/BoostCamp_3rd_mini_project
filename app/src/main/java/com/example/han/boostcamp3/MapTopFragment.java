@@ -51,16 +51,23 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1; //
     private static final int MAX_RESULT_OF_ADDRESS = 1; // 주변에서 얻어올 주소의 수
     private static final int DEFAULT_ZOOM = 15; // 카메라 줌
-    private boolean mLocationPermissionGranted = false; // Loation permission이 부여 되었나를 확인하기 위한 flag
-    private boolean isGoogleClientCreated = false; // 중복 생성되면 에러가 발생하기에 선언한 flag입니다.
+    private boolean mLocationPermissionGranted; // Loation permission이 부여 되었나를 확인하기 위한 flag
+    private boolean isGoogleClientCreated; // 중복 생성되면 에러가 발생하기에 선언한 flag입니다.
 
-    SupportMapFragment mapFragment;
-    SQLiteDatabase sqLiteDatabase;
-    Cursor cursor;
+    private SupportMapFragment mapFragment;
+    private SQLiteDatabase sqLiteDatabase;
+    private Cursor cursor;
     private GoogleMap mMap;
-    TextView mapAddressTextView;
-    Geocoder geocoder;
-    OnClickFabClickListener onClickFabClickListener;
+    private TextView mapAddressTextView;
+    private Geocoder geocoder;
+    private OnClickFabClickListener onClickFabClickListener;
+    private Address address;
+    private List<Address> list;
+    private LatLng latLng;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastKnownLocation;
+    private FloatingActionButton floatingActionButton;
+
 
     @Override
     public void onAttach(Context context) {
@@ -69,12 +76,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
         onClickFabClickListener = (OnClickFabClickListener)context;
     }
 
-    Address address;
-    List<Address> List;
-    LatLng latLng;
-    GoogleApiClient mGoogleApiClient;
-    Location mLastKnownLocation;
-    FloatingActionButton floatingActionButton;
+
 
     @Nullable
     @Override
@@ -160,6 +162,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
         // 리스너 및 오른쪽 상단의 자기위치 버튼과 오른쪽 하단에 + - 버튼을 추가합니다.
         mMap.setOnMarkerDragListener(this);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+
         checkMyLocation();
 
     }
@@ -208,9 +211,9 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
     public String getCurrentAddress(double lat, double lng) {
 
         try {
-            List = geocoder.getFromLocation(lat, lng, MAX_RESULT_OF_ADDRESS);
-            address = List.get(0);
-            List.clear();
+            list = geocoder.getFromLocation(lat, lng, MAX_RESULT_OF_ADDRESS);
+            address = list.get(0);
+            list.clear();
 
             return address.getAddressLine(0);
         } catch (IOException e) {
@@ -219,7 +222,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
         }
 
     }
-
+    // 맵을 준비할 시 오른쪽 상단 버튼을 준비하기 위한 절차
     public void checkMyLocation() {
 
         if (ActivityCompat.checkSelfPermission(getContext(),
@@ -232,8 +235,8 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            /*mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);*/
         }
 
         if (mLocationPermissionGranted) {
@@ -250,6 +253,8 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
 
     }
 
+    // 오른쪽 상단의 버튼을 누를시 내 장소로 카메라가 옮겨가는 메소드
+    // 내 장소를 얻어오기 위해 퍼미션 체크가 필수적으로 들어가야 합니다.
     @Override
     public boolean onMyLocationButtonClick() {
 
@@ -267,7 +272,7 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
 
 
         if (mLocationPermissionGranted) {
-
+        // 현재 내 장소를 얻어오는 메소드
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
         }
@@ -287,32 +292,36 @@ public class MapTopFragment extends Fragment implements OnMapReadyCallback, Goog
         return true;
     }
 
-
+    // 지도화면에서 다음 버튼을 누를시 다음 등록된 장소를 보여주기 위한 메소드
     public void searchNextLocation() {
+
 
         double lat;
         double lng;
 
-        if (cursor.isAfterLast()||cursor.isLast()) {
 
-            cursor.moveToFirst();
-            Log.d("MoveToFirst","yyy");
+        if(cursor.getCount()==0) return;
 
-        } else {
+            if (cursor.isAfterLast() || cursor.isLast()) { // 커서가 마지막일 시
 
-            cursor.moveToNext();
-            Log.d("MoveToNext","nextnextnext");
-        }
+                cursor.moveToFirst();
+                Log.d("MoveToFirst", "yyy");
 
-        lat = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LAT));
-        lng = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LNG));
-        String address = cursor.getString(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_ADDRESS));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(lat, lng), 15));
+            } else {
 
-        //String addressString = getCurrentAddress(lat,lng);
-        mapAddressTextView.setText(address);
+                cursor.moveToNext();
+                Log.d("MoveToNext", "nextnextnext");
+            }
+
+            lat = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LAT));
+            lng = cursor.getDouble(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_LNG));
+            String address = cursor.getString(cursor.getColumnIndex(ShopContract.ShopEntry.SHOP_ADDRESS));
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(lat, lng), 15));
+
+            mapAddressTextView.setText(address);
 
     }
 

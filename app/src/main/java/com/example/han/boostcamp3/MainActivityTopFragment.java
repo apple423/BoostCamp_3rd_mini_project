@@ -85,7 +85,8 @@ public class MainActivityTopFragment extends Fragment {
         @Override
         public void afterTextChanged(Editable s) {
             int length = s.length();
-           countLengthTextView.setText(length + "/300");
+            String text = String.format(getString(R.string.set_text_in_count_textview),length);
+            countLengthTextView.setText(text);
 
 
         }

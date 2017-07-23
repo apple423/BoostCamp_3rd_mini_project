@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements
                 FragmentTransaction fragmentTransactionPrev = getSupportFragmentManager().beginTransaction();
                 fragmentTransactionPrev.replace(R.id.main_top_fragment,mapTopFragment);
                 fragmentTransactionPrev.replace(R.id.main_bottom_fragment, mapBottomFragment);
-
                 fragmentTransactionPrev.commit();
 
 
@@ -195,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onClickMapNextButton(int id) {
 
         if(id == R.id.map_next_cardView){
+
 
             mapTopFragment.searchNextLocation();
         }

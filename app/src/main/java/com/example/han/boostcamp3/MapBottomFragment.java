@@ -36,6 +36,7 @@ public class MapBottomFragment extends Fragment implements View.OnClickListener{
 
         map_next_CardView = (CardView) view.findViewById(R.id.map_next_cardView);
         map_next_CardView.setOnClickListener(onClickListener);
+
         return view;
     }
 
@@ -62,6 +63,7 @@ public class MapBottomFragment extends Fragment implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
+
             nextButtonClickListener.onClickMapNextButton(v.getId());
         }
     };
